@@ -1,0 +1,11 @@
+mongodb×ÊÁÏ²éÑ¯ÍøÖ·
+http://tcrct.iteye.com/blog/2108099
+http://www.cnblogs.com/cswuyg/p/5869256.html
+http://www.cnblogs.com/qiumingcheng/p/5631324.html
+http://www.cnblogs.com/smartloli/p/4305739.html
+http://www.runoob.com/mongodb/mongodb-connections.html
+http://blog.csdn.net/huaishu/article/details/9253769
+http://blog.csdn.net/wang1144/article/details/53964999
+http://www.2cto.com/database/201408/322384.html
+http://www.yiibai.com/mongodb/mongodb_capped_collections.html
+http://www.chinacloud.cn/show.aspx?id=16102&cid=12

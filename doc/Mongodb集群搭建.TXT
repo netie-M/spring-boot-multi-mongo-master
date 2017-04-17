@@ -1,0 +1,182 @@
+Mongodb集群搭建三种方式 Replica Set / Sharding / Master-Slaver
+
+/*
+ * Replica Set 模式
+ * 
+ * 分三种类型节点,mongodb-M(主节点),mongodb-S(备选节点),mongodb-A(仲裁节点)
+ * 由于仲裁节点不提供数据服务,在链接数据库仅连接主备两种节点
+ * 样例中分别为:172.16.36.121:17017,172.16.36.113:17017,172.16.36.93:17017
+ * 分以下步骤完成:
+ * 1. 按非鉴权方式启动所有服务
+ *	PS:需要设置相同的replSet	    
+ * 2. 在主节点下配置副本集
+ * 3. 在主节点下创建用户
+ * 4. 停止所有服务,按鉴权方式重启服务
+**/
+
+/*
+ * Sharding 模式
+ * 
+ * 分片分三种类型节点,mongodb-R(路由节点),mongodb-C(配置服务节点),mongodb-D(数据分片节点)
+ * 数据分片与配置服务均可以为Replica集群也可以为单独数据服务;
+ * 配置服务为Replica集群时没有仲裁节点;
+ *
+ * 由于仲裁节点不提供数据服务,在链接数据库仅连接主备两种节点
+ * 样例中,数据分片均采用Replica模式
+ *    数据分片分别为:172.16.36.121:17017,172.16.36.113:17017,172.16.36.93:17017
+ *    配置服务分别为:172.16.36.121:37017,172.16.36.113:37017,172.16.36.93:37017
+ * 分以下步骤完成:
+ * 1. 按非鉴权方式启动所有服务
+ *	PS:数据分片与配置服务分别设置replSet
+ *      配置服务与数据分片分别需要配置参数configsvr与shardsvr,以此表明在Sharding 模式下各自任务分配
+ * 2. 在配置服务与数据分片的主节点下分别配置各自副本集
+ * 3. 在路由节点下创建用户
+ * 4. 在路由节点下串联路由服务与数据分片
+ * 5. 停止所有服务,按鉴权方式重启服务
+**/
+
+/***************************************************************************************************************************/
+/*
+ * 串联路由服务与数据分片,在主节点的admin数据库下执行
+ */ 
+样例:
+use admin
+---- 设置数据服务的Replica节点
+rs.initiate({"_id":"testrs02","members":[{"_id":1,"host":"172.16.36.121:17017"},{"_id":2,"host":"172.16.36.113:17017"},{"_id":3,"host":"172.16.36.93:17017","arbiterOnly":true}]}) 
+---- 设置配置服务的Replica节点  PS: Replica集群模式下没有仲裁节点
+rs.initiate({"_id":"config01","members":[{"_id":1,"host":"172.16.36.121:37017"},{"_id":2,"host":"172.16.36.113:37017"},{"_id":3,"host":"172.16.36.93:37017"}]}) 
+---- 设置副本可读
+db.getMongo().setSlaveOk()
+---- 增删副本
+rs.add("ip:port");
+rrs.remove("ip:port");
+---- 查看当前状态
+rs.status()
+
+/***************************************************************************************************************************/
+/*
+ * 串联路由服务与数据分片,在路由节点的admin数据库下执行
+ */ 
+样例:
+use admin
+---- 分片为Replica集群模式
+db.runCommand( { addshard : "testrs02/172.16.36.121:17017,172.16.36.113:17017,172.16.36.93:17017"})
+---- 分片为单机集群模式
+db.runCommand( { addshard : "172.16.36.121:17017,172.16.36.113:17017,172.16.36.93:17017"})
+---- 查询分片
+db.runCommand( { listshards : 1 } )
+---- 查询分片
+use config
+db.shards.find()
+db.databases.find() 
+#PS:"partitioned" : true -- 开启分片
+---- 删除分片
+db.runCommand({"removeshard":"192.168.32.13:27020"})
+----指定数据库分片生效
+db.runCommand( { enablesharding :"demo"})
+----指定数据库里需要分片的集合和片键
+db.runCommand( { shardcollection : "demo.app_user",key : {id: 1} } 
+
+/***************************************************************************************************************************/
+/*
+ * 添加鉴权
+ * PS: Replica模式在主节点下执行 
+ *     Sharding模式在路由节点下执行
+ */
+
+-- keyFile方式鉴权
+cd local/mongodb/key/
+openssl rand -base64 756 > keyfile-mongodb
+chmod 400 keyfile-mongodb
+
+-- 创建用户
+./mongo --host 172.16.36.121
+use admin
+db.createUser({user:"root",pwd:"root",roles:[{role:"root",db:"admin"}]})
+db.createUser({user:"admin",pwd:"admin",roles:[{role:"userAdminAnyDatabase",db:"admin"}]})
+use demo
+db.createUser({user:"appadmin01",pwd:"1qaz2wsx",roles:[{role:"readWrite",db:"demo"}]})
+db.createUser({user:"appadmin02",pwd:"1qaz2wsx",roles:[{role:"readWrite",db:"demo"}]})
+db.createUser({user:"appadmin03",pwd:"1qaz2wsx",roles:[{role:"readWrite",db:"demo"}]})
+
+-- 登陆账号
+./mongo -u 'root' -p 'root' --authenticationDatabase 'admin'
+或
+use admin
+db.auth("root","root")
+
+/***************************************************************************************************************************/
+/* 
+ * 启动服务
+ *
+ * 单台是通过-auth属性，集群是通过keyFile来进行服务器间的验证
+ * 链接url: mongodb://username:password@host:port,host:port/dbname
+ * 
+**/
+
+样例:
+cd /home/admin/local/mongodb/bin
+---- 启动路由
+./mongos 
+	--configdb config01/172.16.36.121:37017,172.16.36.113:37017,172.16.36.93:37017 
+	--port 47017 
+	--logpath /home/admin/local/mongodb/log/mongos.log 
+	--fork 
+	--keyFile /home/admin/local/mongodb/key/keyfile-mongodb
+---- 启动配置服务
+./mongod 
+	--replSet config01 
+	--configsvr 
+	--port 37017 
+	--dbpath=/home/admin/local/mongodb/configdata/ 
+	--logpath /home/admin/local/mongodb/log/mongodb_config.log 
+	--fork 
+	--keyFile /home/admin/local/mongodb/key/keyfile-mongodb 
+	--auth
+---- 启动数据服务
+./mongod 
+	--replSet testrs02 
+	--shardsvr  
+	--port 17017 
+	--dbpath=/home/admin/local/mongodb/sharddata/  
+	--logpath /home/admin/local/mongodb/log/mongodb_shard.log  
+	--fork 
+	--keyFile /home/admin/local/mongodb/key/keyfile-mongodb 
+	--auth
+---- 使用配置文件方式启动
+./mongod 
+	-f home/admin/mongodb.conf
+/***************************************************************************************************************************/
+/* 
+ * 其他命令
+*/
+-- linux本地上传到其他机器
+scp –r filename admin@172.16.36.93:/home/admin/local/mongodb/key/ 
+-- 查看配置文件
+cat mongodb.conf
+-- 停止服务
+ps -ef |grep mongod
+kill -9 服务id
+-- 查看日志
+cat ../log/mongodb.log
+-- 创建文件夹
+mkdir local/mongodb/
+-- 解压文件
+tar -zxvf mongodb-linux-x86_64-3.4.2
+-- 移动文件并重命名
+mv mongodb-linux-x86_64-3.4.2 local/mongodb/
+-- 删除data文件下所有内容
+rm -rf /home/admin/local/mongodb/data/*
+rm -rf /home/admin/local/mongodb/sharddata/*
+rm -rf /home/admin/local/mongodb/configdata/*
+-- 设置端口开放
+/sbin/iptables -I INPUT -p tcp --dport 27017 -j ACCEPT
+-- 关闭防火墙
+service iptables stop
+-- 检查系统是否为UTF-8编码
+echo $LANG
+export LANG=en_US.UTF-8
+--下载 MongoDB
+curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.2.tgz
+
+
