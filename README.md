@@ -27,7 +27,7 @@ spring_boot_oauth机制如下:
 4.在100~150秒内使用access_token,返回报文:{"error": "invalid_token","error_description": "Invalid access token: d3014832-057a-45bc-bd26-e4ad13ead324"}
 5.在100~150秒内刷新token,返回报文:{"access_token":"8c7d9e56-069f-4941-824b-d7c40a982e02","token_type":"bearer","refresh_token":"65b548b4-768a-4d17-b890-9dbec5c80299","expires_in":99,"scope":"read write openid"}
 注意事项:access_token 有更新,但refresh_token未改变
-6.在150秒之后刷新token,返回报文:{"error": "invalid_grant","error_description": "Invalid refresh token [][expire]: 65b548b4-768a-4d17-b890-9dbec5c80299"}
+6.在150秒之后刷新token,返回报文:{"error": "invalid_grant","error_description": "Invalid refresh token: 65b548b4-768a-4d17-b890-9dbec5c80299"}
 7.在刷新token完成后的100秒使用access_token,交易正常
 8. 刷新token完成后100秒,再次登陆返回报文:{"access_token":"8c7d9e56-069f-4941-824b-d7c40a982e02","token_type":"bearer","refresh_token":"65b548b4-768a-4d17-b890-9dbec5c80299","expires_in":65,"scope":"read write openid"}
 注意事项:返回报文与刷新token报文一致,仅有效时间减少,但极有可能refresh_token已经失效;若失效在此次access_token失效后,不可再次刷新;
