@@ -27,7 +27,7 @@
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
     }
-     
+     //http://dawn-sky.iteye.com/blog/1343659
      @Bean
     public MongoClientOptions mongoClientOptions(){
         return MongoClientOptions.builder()
