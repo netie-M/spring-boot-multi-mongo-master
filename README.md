@@ -13,6 +13,22 @@
   
  Query query = Query.query(Criteria.where("mobile").is("186*").orOperator(Criteria.where("idNo").is("123456"),Criteria.where("idNo").is(null)));
  
+ 
+  /**
+     *  去掉_class列
+     * @param mongoDbFactory
+     * @param mappingContext
+     * @return
+     */
+    @Bean
+    public MappingMongoConverter mappingMongoConverter(MongoDbFactory mongoDbFactory,
+                                                       MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext){
+        MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(mongoDbFactory),mappingContext);
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return converter;
+    }
+    
+ 
 oauth token 有效期总结
 
 设置access_token 有效时间为100 refresh_token 有效时间为150
