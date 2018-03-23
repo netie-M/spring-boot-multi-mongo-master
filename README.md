@@ -28,6 +28,20 @@
         return converter;
     }
     
+     @Bean
+    public MongoClientOptions mongoClientOptions(){
+        return MongoClientOptions.builder()
+            .connectionsPerHost(100)//设置每个主机的最大连接数
+            .connectTimeout(10000)//设置连接超时
+            .maxConnectionIdleTime(0)//设置池连接的最大空闲时间
+            .maxConnectionLifeTime(0)//设置池连接的最大生命时间
+            .maxWaitTime(120000)//设置的最长时间，线程阻塞等待连接
+            .minConnectionsPerHost(0)//设置每个主机的最小连接数
+            .socketTimeout(0)//设置套接字超时
+            .threadsAllowedToBlockForConnectionMultiplier(5)//设置允许阻塞等待连接的线程数量的倍数
+            .socketKeepAlive(true)
+            .build();
+    
  
 oauth token 有效期总结
 
