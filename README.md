@@ -13,8 +13,8 @@
   
  Query query = Query.query(Criteria.where("mobile").is("186*").orOperator(Criteria.where("idNo").is("123456"),Criteria.where("idNo").is(null)));
  
- 
-  /**
+    
+     /**
      *  去掉_class列
      * @param mongoDbFactory
      * @param mappingContext
@@ -27,7 +27,7 @@
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
     }
-    
+     
      @Bean
     public MongoClientOptions mongoClientOptions(){
         return MongoClientOptions.builder()
