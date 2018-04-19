@@ -89,4 +89,19 @@ spring_boot_oauth机制如下:
         System.out.println(tradeNo.replaceAll("\\w{13}(\\w{8})\\w{13}","$1"));
         System.out.println(tradeNo.replaceAll("\\w{21}(\\w{6})\\w{7}","$1"));
     }
+    
+        spring.mail.host=mail.quarkfinance.com
+        spring.mail.port=587
+        spring.mail.username=cobra-monitor
+        spring.mail.password=)A71ZMxb=7
+        spring.mail.test-connection=false
+        spring.mail.properties.mail.debug=false
+        #spring.mail.properties.mail.smtp.auth=true
+        #spring.mail.properties.mail.smtp.starttls.enable=true
+        #spring.mail.properties.mail.smtp.starttls.required=true
+        #spring.mail.properties.mail.event.executor=
+        spring.mail.properties.mail.smtp.connecttimeout=5000
+        spring.mail.properties.mail.smtp.timeout=3000
+        spring.mail.properties.mail.smtp.writetimeout=5000
 
+   
