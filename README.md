@@ -73,8 +73,8 @@ spring_boot_oauth机制如下:
 
 9.若需要新的access_token需要在原有的失效以后再次登陆;
 
-{
-public static void main(String[] args) {
+
+    public static void main(String[] args) {
         String tradeNo =  "10C1010001234201804191128428304538";
         System.out.println(tradeNo);
         System.out.println(tradeNo.replaceAll("(\\w{2})(\\w{32})","$1"));
@@ -89,4 +89,4 @@ public static void main(String[] args) {
         System.out.println(tradeNo.replaceAll("\\w{13}(\\w{8})\\w{13}","$1"));
         System.out.println(tradeNo.replaceAll("\\w{21}(\\w{6})\\w{7}","$1"));
     }
-    }
+
