@@ -105,3 +105,15 @@ spring_boot_oauth机制如下:
         spring.mail.properties.mail.smtp.writetimeout=5000
 
    
+       config.posp_private_key:       
+       "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAINZLTEg94hR1OzSPV3yJF5ueInF8lzErIrrspS1ELMY0G6JF6vz9OK0p9Ds0QX0S8Mah/hRHqpqrfh9+nDHbjqlsul20TgRnq9zDVf4f+llXxcWiv6lfR1WqnLM1ZQLJtbPlXDzymj6FFsdyEt8CSNIwQ7h4BUvgi7pFJ8ZEZ9VAgMBAAECgYAD9EpVAU4Sb4w+ePHaAzEvGppMY4YxXsZnBEODEJRpH+UefsgUqCqGLLQkqQx95mXlgMX5JtAKh12nbnt8q7RYypKjLmIKg77E+4ORZBpI3RRVpSJ/B5/cyUidGGagZTYsAZ0ZKjYNZsc55A4Rz1bpZtbT75rl1zyBLhpeC2XJoQJBAMazkdzJpD5NdnBkZs7Bqaj2R8GpS5HkvBO5matuSagMJnX7ZH4rtkp/aSl4ZNNtXrNhtbwNXd6C/CbvARZHjf0CQQCpOYC69Sp+rq3hPgn9BVt0oYwPL8nlrVitzeVTQ6KjpZ/mPSzbcl+Je6++mZ4TCnrJgLk8z4tQLG11AODdDao5AkAijryBj7g29bXxmiSfNONS9XJJZi40c3maXJ8zR30b8vEFd/FkWCneDwa1JbEzbEQaIpY+3HxE5LcB9nNT8qHpAkB5fdIg52Dh4HDvdAXhxJXbTxvpz0po/aHb7iVFORqr2H3K44Kv7hYO82DCOzGUxAJRZnwW335KSgsvZDkMGwJpAkEAvxJhxIofvGCNBXYTLB+Xl/gwl0GcRBlbBuv0dlQ9Q4U/59vtY8sIe0Rh7d8+qc1LGWbMFImkhQoVfAtuDEShBg=="
+   
+      var Jsrsasign = require('jsrsasign');
+      var rsa = Jsrsasign.KEYUTIL.getKeyFromPlainPrivatePKCS8PEM("-----BEGIN PRIVATE KEY-----"+config.posp_private_key+"-----END PRIVATE KEY-----");
+    var sign = Jsrsasign.hex2b64(rsa.sign(clearText,"sha1"));
+    
+    var signature = new Jsrsasign.Signature({"alg": "SHA1withRSA", "prov": "cryptojs/jsrsa"});
+    signature.init(prvKey);
+    var sign = Jsrsasign.hex2b64(signature.signString(clearText));
+    
+    两种方式获得的签名是一致的;
