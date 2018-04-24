@@ -116,4 +116,13 @@ spring_boot_oauth机制如下:
     signature.init(prvKey);
     var sign = Jsrsasign.hex2b64(signature.signString(clearText));
     
-    两种方式获得的签名是一致的;
+      两种方式获得的签名是一致的;
+      
+      JS 加密
+      var Jsrsasign = require('jsrsasign');
+      let JSEncrypt = new jsencrypt.JSEncrypt();
+      JSEncrypt.setPublicKey(config.publickey);
+      let cipher = JSEncrypt.encrypt(clearText);
+      
+      java解密
+      RSA/ECB/PKCS1Padding
