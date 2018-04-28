@@ -116,7 +116,20 @@ spring_boot_oauth机制如下:
     signature.init(prvKey);
     var sign = Jsrsasign.hex2b64(signature.signString(clearText));
     
-      两种方式获得的签名是一致的;
+    
+    let rsa_private = new Jsrsasign.RSAKey();
+    rsa_private.readPKCS8PrvKeyHex(Jsrsasign.b64tohex(config.posp_private_key));
+    let rsa_public =  new Jsrsasign.RSAKey();
+    rsa_public.readPKCS8PubKeyHex(Jsrsasign.b64tohex(config.pospForBorrowerLite_public_key));
+
+    const sign = function (clearText) {
+        return Jsrsasign.hex2b64(rsa_private.sign(clearText,"sha1"));
+    }
+    const verify = function (clearText,sign) {
+        return rsa_public.verify(clearText,Jsrsasign.b64tohex(sign));
+    }
+    
+      以上方式获得的签名是一致的;
       
       JS 加密
       var Jsrsasign = require('jsrsasign');
