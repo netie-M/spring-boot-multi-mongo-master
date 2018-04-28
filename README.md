@@ -144,3 +144,12 @@ spring_boot_oauth机制如下:
       this.setState({"page":"<h1>ERROR</h1>"})
       var page={__html:this.state.page};
       <div dangerouslySetInnerHTML={page} ></div>
+      
+      react 页面跳转并传参数
+            this.props.history.push( {
+                pathname:'/transfer',
+                state:response.data,
+            });
+            
+            react 页面加载新元素
+            ReactDOM.render(<iframe frameBorder="0" scrolling="auto" height="100%" width="100%" srcDoc={html}></iframe>,document.getElementById(elementId));
