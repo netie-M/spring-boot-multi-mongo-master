@@ -153,3 +153,17 @@ spring_boot_oauth机制如下:
             
             react 页面加载新元素
             ReactDOM.render(<iframe frameBorder="0" scrolling="auto" height="100%" width="100%" srcDoc={html}></iframe>,document.getElementById(elementId));
+            
+            
+            
+            @JsonIgnore注解用来忽略某些字段，可以用在Field或者Getter方法上，用在Setter方法时，和Filed效果一样。这个注解只能用在POJO存在的字段要忽略的情况，不能满足现在需要的情况。
+        @JsonIgnoreProperties(ignoreUnknown = true)，将这个注解写在类上之后，就会忽略类中不存在的字段，可以满足当前的需要。这个注解还可以指定要忽略的字段。使用方法如下：
+        @JsonIgnoreProperties({ "internalId", "secretKey" })
+            正确在class上加
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public class tes
+ 
+        或者代码控制
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.readValue(json,cls);
