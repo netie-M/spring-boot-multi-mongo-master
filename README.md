@@ -167,3 +167,5 @@ spring_boot_oauth机制如下:
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.readValue(json,cls);
+        
+        http://san-yun.iteye.com/blog/2065732
